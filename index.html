@@ -1,0 +1,79 @@
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Webchat com socketIO</title>
+
+    <style media="screen">
+        body {width: 500px; margin: 0 auto; margin-top: 2rem; }
+        .send {width: 100%; margin: 0; padding: 0; margin-top: 1rem; }
+        input.text {width: 80%; margin: 0; padding: 0; padding: 5px; }
+        .btn {padding: 5px 0; width: 82px; background-color: #eee; border: 0; margin: 0; border: solid #eee;        }
+        .btn:hover {background-color: #00e4bc}
+        ul {list-style-type: none;width: 100%;padding: 0;margin: 0;}
+        li { padding: 5px 10px; }
+        li:nth-child(odd) {background-color: #eee}
+    </style>
+
+    <ul class="ul" id="messages"></ul>
+
+    <div class="send">
+        <input class="text" autofocus="" id="menssagem" autocomplete="off" placeholder="Cloud está em apuros!">
+        <button class="btn" id="enviar_menssagem">Send</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.getElementById('menssagem').addEventListener('keypress', function(e) {
+            var key = e.which || e.keyCode;
+            if (key == 13) {
+                enviar_menssagem();
+            }
+        });
+
+        var socket = io();
+
+        var nome_usuario = prompt("Qual seu nome?");
+
+        var ff = [
+            "Cloud Strife",
+            "Sephiroth",
+            "Vincent Valentine",
+            "Zack Fair",
+            "Aerith Gainsborough",
+            "Tifa Lockhart",
+            "Barret Wallace",
+            "Yuffie Kisaragi",
+        ];
+
+        if (nome_usuario === null || nome_usuario == "" || nome_usuario == " ") {
+            nome_usuario = ff[Math.floor(Math.random() * ff.length)];
+        }
+
+        socket.emit('chat message', "Bem vindo! " + nome_usuario);
+
+        document.getElementById('enviar_menssagem').addEventListener("click", enviar_menssagem);
+
+        function enviar_menssagem() {
+
+        msg = document.getElementById('menssagem').value;
+
+        if(msg.length > 0) {
+            console.log(msg);
+
+            socket.emit('chat message', nome_usuario + ": " + msg);
+
+            document.getElementById('menssagem').value = "";
+        }
+        }
+
+        socket.on('chat message', function(msg){
+            let ul = document.getElementById("messages");
+
+            let li = document.createElement('li');
+
+            let br = document.createElement('br');
+            li.appendChild(document.createTextNode(msg));
+
+            ul.appendChild(li);
+        });
+    </script>
